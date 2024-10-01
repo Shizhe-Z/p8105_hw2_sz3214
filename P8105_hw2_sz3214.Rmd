@@ -117,4 +117,35 @@ gwynnda |>
 
 The total number of cigarette butts collected by Gwynnda in June of 2022 is 18120.
 
+# Problem 3
+
+```{r}
+bakers = 
+  read_csv('data/gbb_datasets/bakers.csv', na = c("NA", ".", "")) |> 
+  janitor::clean_names() |> 
+  separate(baker_name, into = c("first_name", "last_name"), sep = " ")
+
+bakes = 
+  read_csv('data/gbb_datasets/bakes.csv', na = c("NA", ".", "")) |> 
+  janitor::clean_names()
+
+result = 
+  read_csv('data/gbb_datasets/results.csv', skip=2, na = c("NA", ".", "")) |> 
+  janitor::clean_names()
+  
+viewers = 
+  read_csv('data/gbb_datasets/viewers.csv', na = c("NA", ".", "")) |>
+  janitor::clean_names() |> 
+  pivot_longer(
+    cols = series_1:series_10,
+    names_to = "series",
+    values_to = "viewer"
+  ) |> 
+  mutate(series = str_replace(series, "series_", "")) |> 
+  mutate(series = as.integer(series))
+```
+
+
+
+
 
