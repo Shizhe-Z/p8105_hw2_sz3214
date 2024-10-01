@@ -123,15 +123,17 @@ The total number of cigarette butts collected by Gwynnda in June of 2022 is 1812
 bakers = 
   read_csv('data/gbb_datasets/bakers.csv', na = c("NA", ".", "")) |> 
   janitor::clean_names() |> 
-  separate(baker_name, into = c("first_name", "last_name"), sep = " ")
+  separate(baker_name, into = c("first_name", "last_name"), sep = " ") 
 
 bakes = 
   read_csv('data/gbb_datasets/bakes.csv', na = c("NA", ".", "")) |> 
-  janitor::clean_names()
+  janitor::clean_names() |> 
+  rename(first_name=baker)
 
-result = 
+results = 
   read_csv('data/gbb_datasets/results.csv', skip=2, na = c("NA", ".", "")) |> 
-  janitor::clean_names()
+  janitor::clean_names() |> 
+  rename(first_name=baker)
   
 viewers = 
   read_csv('data/gbb_datasets/viewers.csv', na = c("NA", ".", "")) |>
@@ -145,7 +147,29 @@ viewers =
   mutate(series = as.integer(series))
 ```
 
+check and correct tables
 
+```{r}
+anti_join(bakers, bakes, by = "first_name")
+anti_join(bakers, results, by = "first_name")
+anti_join(bakes, results, by = c("series", "episode"))
 
+bakers|>
+  mutate(first_name = ifelse(first_name == "Jo","Joanne", first_name))
+```
 
+merge data
 
+```{r}
+gbb = 
+  left_join(bakes, bakers, by = c("first_name","series")) |> 
+  left_join(results, by = c("first_name","series", "episode")) |> 
+  left_join(viewers, by = c("series", "episode")) |> 
+  relocate(series,episode,first_name,last_name, signature_bake,show_stopper,technical,result,baker_age, baker_occupation, hometown)
+```
+
+export
+
+```{r}
+write_csv(gbb, 'data/gbb_datasets/gbb.csv')
+```
