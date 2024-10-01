@@ -1,0 +1,20 @@
+---
+title: "p8105_hw2_sz3214"
+author: "Shizhe Zhang"
+date: "2024-09-30"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(readr)
+```
+
+```{r}
+mta = 
+  read_csv('data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv', na = c("NA", ".", "")) |> 
+  janitor::clean_names() |> 
+  select(line:entry, vending, ada) |> 
+  mutate(entry=ifelse(entry == "YES", TRUE, FALSE))
+head(mta, 10)
+```
