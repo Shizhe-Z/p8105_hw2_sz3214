@@ -10,6 +10,9 @@ library(tidyverse)
 library(readr)
 ```
 
+# Problem 1
+
+## Import and Clean data
 ```{r}
 mta = 
   read_csv('data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv', na = c("NA", ".", "")) |> 
@@ -18,3 +21,39 @@ mta =
   mutate(entry=ifelse(entry == "YES", TRUE, FALSE))
 head(mta, 10)
 ```
+
+The dataset contains variables: `r names(mta)`. 
+First, read the cvs file and clean its column names.
+Second, select all the variables you want.
+Third, change the `entry` variable from character to logical.
+The dataset has `r nrow(mta)` rows and `r ncol(mta)` columns.
+The dataset is not tidy enough.
+
+## Answer questions
+
+```{r}
+distinct(mta, line, station_name) |> 
+  nrow()
+```
+There are 465 distinct stations.
+
+```{r}
+filter(mta, ada == TRUE) |> 
+  distinct(line, station_name) |> 
+  nrow()
+```
+There are 84 ADA compliant.
+
+```{r}
+filter(mta, entry = TRUE, vending == "NO") |> 
+  summarise(proportion = n() / nrow(mta)) 
+```
+The proportion of station entrances / exits without vending allow entrance is 9.8%.
+
+
+
+
+
+
+
+
