@@ -165,7 +165,8 @@ gbb =
   left_join(bakers, results, by = c("first_name","series")) |> 
   left_join(viewers, by = c("series", "episode")) |> 
   left_join(bakes, by = c("first_name", "series", "episode")) |> 
-  relocate(series,episode,first_name,last_name, signature_bake,show_stopper,technical,result,baker_age, baker_occupation, hometown)
+  relocate(series,episode,first_name,last_name, signature_bake,show_stopper,technical,result,baker_age, baker_occupation, hometown) |> 
+  arrange(series, episode)
 ```
 
 export
@@ -177,7 +178,7 @@ write_csv(gbb, 'data/gbb_datasets/gbb.csv')
 Data cleaning process: Importing 4 tables, seperating `baker_name` in table bakers, and making `baker` in other tables have the same variable name with bakers which is `first_name`.
 Rearrange the viewers table, making the variables match other tables and deleting the redundant part of the `series` values, then change the variable type towards integer.
 When checking the tables, I find there is no data about series 9 and 10 in table bakes. Also Joanne' name was recorded as Jo. So I changed Joanne's name.
-After merging 4 tables, I find the sort of columns were a little bit mess, so I rearrange the sort of columns.
+After merging 4 tables, I find the sort of columns were a little bit mess, so I rearrange the sort of columns. And sort the data by series and episode.
 In final gbb dataset, there are all variables about bakes and bakers in series 1-8, and their relevant. There are `r ncol(gbb)` variables and `r nrow(gbb)` observations in it.
 
 ```{r}
