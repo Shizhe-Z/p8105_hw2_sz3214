@@ -134,17 +134,6 @@ results =
   read_csv('data/gbb_datasets/results.csv', skip=2, na = c("NA", ".", "")) |> 
   janitor::clean_names() |> 
   rename(first_name=baker)
-  
-viewers = 
-  read_csv('data/gbb_datasets/viewers.csv', na = c("NA", ".", "")) |>
-  janitor::clean_names() |> 
-  pivot_longer(
-    cols = series_1:series_10,
-    names_to = "series",
-    values_to = "viewer"
-  ) |> 
-  mutate(series = str_replace(series, "series_", "")) |> 
-  mutate(series = as.integer(series))
 ```
 
 check and correct tables
@@ -163,7 +152,6 @@ merge data
 ```{r}
 gbb = 
   left_join(bakers, results, by = c("first_name","series")) |> 
-  left_join(viewers, by = c("series", "episode")) |> 
   left_join(bakes, by = c("first_name", "series", "episode")) |> 
   relocate(series,episode,first_name,last_name, signature_bake,show_stopper,technical,result,baker_age, baker_occupation, hometown) |> 
   arrange(series, episode)
@@ -175,10 +163,9 @@ export
 write_csv(gbb, 'data/gbb_datasets/gbb.csv')
 ```
 
-Data cleaning process: Importing 4 tables, seperating `baker_name` in table bakers, and making `baker` in other tables have the same variable name with bakers which is `first_name`.
-Rearrange the viewers table, making the variables match other tables and deleting the redundant part of the `series` values, then change the variable type towards integer.
+Data cleaning process: Importing 3 tables, seperating `baker_name` in table bakers, and making `baker` in other tables have the same variable name with bakers which is `first_name`.
 When checking the tables, I find there is no data about series 9 and 10 in table bakes. Also Joanne' name was recorded as Jo. So I changed Joanne's name.
-After merging 4 tables, I find the sort of columns were a little bit mess, so I rearrange the sort of columns. And sort the data by series and episode.
+After merging 3 tables, I find the sort of columns were a little bit mess, so I rearrange the sort of columns. And sort the data by series and episode.
 In final gbb dataset, there are all variables about bakes and bakers in series 1-8, and their relevant. There are `r ncol(gbb)` variables and `r nrow(gbb)` observations in it.
 
 ```{r}
@@ -188,8 +175,28 @@ select_gbb = gbb |>
 
 In series 5-9, the winner had won star baker in previous episodes several times, while in series 10 David Atherton came to be the winner without any star baker.
 
+```{r}
+viewers = 
+  read_csv('data/gbb_datasets/viewers.csv', na = c("NA", ".", "")) |>
+  janitor::clean_names() |> 
+  pivot_longer(
+    cols = series_1:series_10,
+    names_to = "series",
+    values_to = "viewer"
+  ) |> 
+  relocate(series, episode, viewer) |> 
+  mutate(series = str_replace(series, "series_", "")) |> 
+  mutate(series = as.integer(series))
 
+head(viewers, 10)
 
+viewers |> 
+  filter(series == 1) |> 
+  summarise(mean(viewer, na.rm = TRUE))
 
+viewers |> 
+  filter(series == 5) |> 
+  summarise(mean(viewer, na.rm = TRUE))
+```
 
-
+The average viewship in season 1 and season 5 are 2.77 and 10.0 respectively.
