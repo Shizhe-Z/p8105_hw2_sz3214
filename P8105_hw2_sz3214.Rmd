@@ -162,9 +162,9 @@ merge data
 
 ```{r}
 gbb = 
-  left_join(bakes, bakers, by = c("first_name","series")) |> 
-  left_join(results, by = c("first_name","series", "episode")) |> 
+  left_join(bakers, results, by = c("first_name","series")) |> 
   left_join(viewers, by = c("series", "episode")) |> 
+  left_join(bakes, by = c("first_name", "series", "episode")) |> 
   relocate(series,episode,first_name,last_name, signature_bake,show_stopper,technical,result,baker_age, baker_occupation, hometown)
 ```
 
@@ -180,6 +180,10 @@ When checking the tables, I find there is no data about series 9 and 10 in table
 After merging 4 tables, I find the sort of columns were a little bit mess, so I rearrange the sort of columns.
 In final gbb dataset, there are all variables about bakes and bakers in series 1-8, and their relevant. There are `r ncol(gbb)` variables and `r nrow(gbb)` observations in it.
 
+```{r}
+select_gbb = gbb |> 
+  filter(series %in% c(5,6,7,8,9,10), result %in% c("STAR BAKER", "WINNER"))
+```
 
 
 
